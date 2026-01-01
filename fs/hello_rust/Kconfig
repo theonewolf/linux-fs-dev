@@ -1,0 +1,8 @@
+config HELLO_RUST_FS
+tristate "Rust Hello World Filesystem support"
+depends on RUST
+help
+  This is a simple hello world filesystem implemented in Rust.
+
+  To compile this as a module, choose M here: the module will be called
+  hello_rust.
