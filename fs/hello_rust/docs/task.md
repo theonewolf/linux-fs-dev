@@ -1,0 +1,33 @@
+# Task: Linux Kernel Development with Rust Filesystem Module
+
+- [x] Initial Environment Setup
+    - [x] SSH into the remote VM
+    - [x] Install dependencies (build-essential, rustc, bindgen, etc.)
+- [x] Linux Kernel Repository Management
+    - [x] Git clone Linux kernel
+    - [x] Create a development branch
+- [x] Kernel Configuration and Build
+    - [x] Configure kernel with Rust support
+    - [x] Build the kernel (Resumed with 8GB RAM)
+- [x] Hello World Filesystem Module (Rust)
+    - [x] Implement the filesystem module in Rust
+    - [x] Integrate into the kernel build system
+    - [x] Build the module
+- [x] System Deployment and Verification
+    - [x] Install the new kernel
+    - [x] Configure bootloader for fallback
+    - [x] Boot into the new kernel
+    - [x] Load and verify the Rust module
+- [x] Repository Backup and initial setup
+    - [x] Push code to GitHub backup repository
+- [/] Kernel Version Upgrade (to commit f8f9c1f - v6.19)
+    - [x] Fetch and checkout commit f8f9c1f
+    - [x] Re-verify and upgrade Rust toolchain (to 1.78.0)
+    - [x] Port `hello_rust` changes to the new version
+    - [x] Reconfigure and build the new kernel (v6.19)
+    - [x] Install and verify boot/module loading
+- [ ] VFS Filesystem Implementation (Templating)
+    - [x] Research Rust VFS abstractions in the new kernel version
+    - [x] Template out full VFS trait implementations
+    - [x] Verify build of the expanded module
+    - [x] Push final progress to GitHub
