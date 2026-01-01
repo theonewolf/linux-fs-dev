@@ -1,53 +1,43 @@
-# Kernel Upgrade and VFS Templating Plan
+# VFS Operation Stubs Implementation Plan
 
-This plan outlines the process of moving our Rust filesystem development to the latest Linux kernel (commit `f8f9c1f`, v6.19) and ensuite templating out the full VFS operations.
-
-## User Review Required
-
-> [!WARNING]
-> - **Kernel Version Jump**: Moving from v6.8 to v6.19 (commit f8f9c1f) is a significant jump. Rust abstractions may have changed significantly.
-> - **Toolchain Re-verification**: We must run `scripts/min-tool-version.sh` and `make rustavailable` again as the required Rust/bindgen versions might have increased.
+## Goal Description
+Implement stub methods for essential VFS operations in `hello_rust.rs`. Each stub will:
+1.  Log its invocation to `dmesg` (e.g., "hello_rust: open called").
+2.  Return a success code (`0`) or specific error (e.g., `-EPERM`) as appropriate.
+3.  Be documented with inputs and expected return values.
 
 ## Proposed Changes
 
-### [Kernel Upgrade]
-
-- [ ] Fetch commit `f8f9c1f` and create a new branch `rust-fs-v6.19`.
-- [ ] Re-apply changes:
-    - [ ] `arch/arm64/Kconfig` (add `select HAVE_RUST`)
-    - [ ] `fs/Kconfig` (source `fs/hello_rust/Kconfig`)
-    - [ ] `fs/Makefile` (add `obj-$(CONFIG_HELLO_RUST_FS) += hello_rust/`)
-    - [ ] `fs/hello_rust/` (restore source files)
-    - [ ] `scripts/generate_rust_target.rs` (if still needed for arm64)
-
-### [Rust Toolchain]
-
-- [x] Check new version requirements via `scripts/min-tool-version.sh`.
-- [/] Update `rustc` to 1.78.0 and re-verify `bindgen-cli` 0.65.1.
-  ```bash
-  rustup install 1.78.0
-  rustup default 1.78.0
-  rustup component add rust-src
-  ```
-- [ ] Verify environment: `make rustavailable`.
-
-### [VFS Templating]
-
-- [ ] Implement a full template in `fs/hello_rust/hello_rust.rs` including:
-    - [ ] `FileSystem` registration/unregistration.
-    - [ ] `SuperBlock` operations.
-    - [ ] `Inode` operations (lookup, create, unlink, mkdir, rmdir, etc.).
-    - [ ] `File` operations (read, write, seek, fsync, etc.).
-    - [ ] `AddressSpace` operations (if applicable for page cache).
+### [fs/hello_rust/hello_rust.rs]
+- **Superblock Operations**:
+    - `statfs`: Already stubbed, add logging.
+    - `drop_inode`: Add logging.
+    - `alloc_inode` / `destroy_inode`: Implement simple slab allocation stubs (or use generic if possible, but stubs requested).
+    - `put_super`: usage logging.
+- **Inode Operations**:
+    - `create`: Log and return `-ENOSYS` (not implemented yet, but stubbed).
+    - `lookup`: Log and return NULL (or simple ENOENT).
+    - `unlink`, `mkdir`, `rmdir`: Log and return success or error.
+    - `rename`, `setattr`, `getattr`: Stubs.
+- **File Operations**:
+    - `read_iter`: Log and return 0 (EOF).
+    - `write_iter`: Log and return count (fake write) or error.
+    - `open`: Log.
+    - `release`: Log.
+    - `fsync`: Log.
 
 ## Verification Plan
 
 ### Automated Tests
-- `make LLVM=1 rustavailable`
-- `make LLVM=1 -j$(nproc) M=fs/hello_rust`
+- Build module: `make LLVM=1 M=fs/hello_rust`
 
 ### Manual Verification
-1. Boot into the new kernel (`6.19-rc3` or similar).
-2. Load module: `sudo modprobe hello_rust`.
-3. Verify module load and VFS entry registration in `dmesg`.
-4. Attempt to mount to verify super_block initialization.
+1.  Load module: `insmod hello_rust.ko`.
+2.  Mount: `mount -t hello_rust none /tmp/hello`.
+3.  Trigger Operations:
+    - `ls -la /tmp/hello` (triggers `lookup`, `getattr`, `opendir`, `readdir`).
+    - `touch /tmp/hello/test` (triggers `create`).
+    - `mkdir /tmp/hello/dir` (triggers `mkdir`).
+    - `echo "test" > /tmp/hello/file` (triggers `open`, `write`).
+4.  Check Logs: `dmesg | tail` to see the "hello_rust: ..." messages.
+5.  Unmount and unload.

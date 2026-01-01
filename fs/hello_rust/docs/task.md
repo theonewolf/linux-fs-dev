@@ -31,3 +31,9 @@
     - [x] Template out full VFS trait implementations
     - [x] Verify build of the expanded module
     - [x] Push final progress to GitHub
+- [x] Implement VFS Operation Stubs
+    - [x] Superblock Operations (alloc_inode, destroy_inode, etc.)
+    - [x] Inode Operations (create, lookup, mkdir, etc.)
+    - [x] File Operations (read_iter, write_iter, etc.)
+    - [x] Verify stubs with dmesg logs
+    - [x] Push changes
